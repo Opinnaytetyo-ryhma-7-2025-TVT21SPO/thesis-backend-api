@@ -31,15 +31,6 @@ const r2_client = new S3Client({ region: 'eeur',
     }
  });
 
-//recipes
-router.get('/', isLoggedIn, (req, res) => {
-    Recipe.find().then((recipes) => {
-        res.status(200).json(recipes);
-    }).catch((err) => {
-        res.status(400).json(err);
-    });
-});
-
 function Str_Random(length) {
     let result = '';
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
