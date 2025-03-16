@@ -55,7 +55,7 @@ app.use('/recipes', recipeRoutes);
 app.use('/admin', adminRoutes);
 
 app.get('/', (req, res) => {
-    res.send('<a href="/auth/google">Google Login</a>');
+    res.send("You've reached the API. Good job!");
     });
 
 app.get('/protected', isLoggedIn, (req, res) => {
