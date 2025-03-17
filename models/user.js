@@ -23,6 +23,7 @@ const userSchema = new Schema({
         type: String,
         required: false,
         unique: true,
+        sparse: true,
     },
     bodyData: {
         age: {
@@ -81,6 +82,10 @@ const userSchema = new Schema({
             type: Array,
             required: false,
         },
+    },
+    isAdmin: {
+        type: Boolean,
+        required: false,
     }
 }, {timestamps: true});
 

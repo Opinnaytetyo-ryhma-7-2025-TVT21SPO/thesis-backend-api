@@ -15,7 +15,7 @@ const adminRoutes = require('./routes/admin');
 
 
 function isLoggedIn(req, res, next) {
-    req.user ? next () : res.sendStatus(401).redirect('/');
+    req.user ? next () : res.sendStatus(401);
 }
 
 const app = express();

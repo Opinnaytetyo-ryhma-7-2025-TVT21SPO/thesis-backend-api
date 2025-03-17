@@ -14,22 +14,21 @@ const CLIENT_URL = 'http://localhost:8081';
 
 const Recipe = require('../models/recipe');
 const valid_term = require('../models/valid_term');
-
-function isLoggedIn(req, res, next) {
-    req.user ? next () : res.sendStatus(401).redirect('/');
-}
+const User = require('../models/user');
 
 function isAdmin(req, res, next) {
-    req.user === '67d40df4cec9dc96fcec7f04' ? next() : res.sendStatus(401).redirect('/');
+    User.findById(req.user).then((user) => {
+        if(!user){
+            res.sendStatus(401).redirect('/');
+            return;
+        }
+        user.isAdmin ? next() : res.sendStatus(401);
+        return;
+    }).catch((err) => {
+        res.status(400).json(err);
+        return;
+    })
 }
-
-const r2_client = new S3Client({ region: 'eeur',
-    endpoint: process.env.R2_API_URL,
-    credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
-    }
- });
 
 function Str_Random(length) {
     let result = '';
@@ -43,6 +42,14 @@ function Str_Random(length) {
     return result;
 }
 
+const r2_client = new S3Client({ region: 'eeur',
+    endpoint: process.env.R2_API_URL,
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
+    }
+ });
+
 function uploadToS3(file, name){
     const fileStream = fs.createReadStream(file.path);
     const params = {
@@ -55,7 +62,7 @@ function uploadToS3(file, name){
     return r2_client.send(new PutObjectCommand(params))
 }
 
-router.post('/terms/new', isAdmin, async (req, res) => {
+router.post('/terms/new', isAdmin, (req, res) => {
 
     if(!req.body.termEnglish || !req.body.termFinnish || !req.body.type){
         res.status(400).json({message: "Missing required fields"});

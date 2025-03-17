@@ -9,7 +9,7 @@ const User = require('../models/user');
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:5000/auth/google/redirect",
+    callbackURL: `${process.env.BASE_URL}/auth/google/redirect`,
     passReqToCallback: false
   },
   function(accessToken, refreshToken, profile, done) {
@@ -28,8 +28,6 @@ passport.use(new GoogleStrategy({
         }
     });
   }
-
-  
 ));
 
 passport.use(new LocalStrategy(
@@ -42,9 +40,9 @@ passport.use(new LocalStrategy(
             }).save().then((newUser) => {
                 done(null, newUser);
             });
+        } else if (!user.verifyPassword(password)) { return done(null, false); } else {
+          return done(null, user);
         }
-        if (!user.verifyPassword(password)) { return done(null, false); }
-        return done(null, user);
     });
   }
 ));
