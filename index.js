@@ -15,17 +15,24 @@ const adminRoutes = require('./routes/admin');
 
 
 function isLoggedIn(req, res, next) {
+    console.log(req.user);
     req.user ? next () : res.sendStatus(401);
 }
 
 const app = express();
 
 
+const corsOptions = {
+    origin: 'http://localhost:8081',
+    credentials: true
+};
+app.use(cors(corsOptions))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+app.use(passport.initialize());
 
 const sessionStore = MongoStore.create({
     mongoUrl: process.env.MONGO_DB_URI
@@ -40,11 +47,9 @@ app.use(session({
 }));
 
 
-
-app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors())
+
 
 mongoose.connect(process.env.MONGO_DB_URI,)
     .catch(err => console.error(err));
@@ -59,6 +64,7 @@ app.get('/', (req, res) => {
     });
 
 app.get('/protected', isLoggedIn, (req, res) => {
+    console.log(req.user);
     res.send('wow you logged in :D');
     });
 

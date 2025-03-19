@@ -10,10 +10,13 @@ router.get('/login', (req, res) => {
 });
 
 //auth logout
-router.get('/logout', (req, res) => {
-    // handle with passport
-    req.logout();
-    res.redirect('/')
+router.get('/logout', (req, res, next) => {
+    req.logout(function(err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('http://localhost:8081');
+    })
 });
 
 // auth with google
@@ -22,20 +25,24 @@ router.get('/google', passport.authenticate('google', {
 }));
 
 router.get('/google/redirect', passport.authenticate('google', {
-    successRedirect: 'auth/success',
-    failureRedirect: '/auth/failure'
+    successRedirect: 'success',
+    failureRedirect: '/failure'
 }));
 
 router.get('/local', passport.authenticate('local', {
-    successRedirect: '/auth/success',
-    failureRedirect: '/auth/failure'
-}));
+    successRedirect: '/success',
+    failureRedirect: '/failure'
+},
+function(req, res) {
+    res.sendStatus(200);
+}
+));
 
 router.get('/failure', (req, res) => {
     res.status(401).json({success: false, message: "Failed to authenticate"});
 });
-
-router.get('/success', (req, res) => {
-    res.status(200).json({success: true, message: "Successfully authenticated", user: req.user, cookies: req.cookies});
+// json({success: true, message: "Successfully authenticated", user: req.user, cookies: req.cookies})
+router.get('/google/success', (req, res) => {
+    res.status(200).redirect('http://localhost:8081/Home');
 });
 module.exports = router;

@@ -6,6 +6,22 @@ const LocalStrategy = require('passport-local').Strategy;
 
 const User = require('../models/user');
 
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  try {
+      User.findById(id).then((user) => {
+          done(null, user);
+      });
+  } catch (error) {
+      done(error, null);
+  }
+});   
+
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -18,7 +34,7 @@ passport.use(new GoogleStrategy({
             done(null, currentUser);
         } else {
             new User({
-                email: profile.emails[0].value,
+                username: profile.emails[0].value,
                 displayName: profile.displayName,
                 givenName: profile.name.givenName,
                 googleId: profile.id
@@ -46,11 +62,3 @@ passport.use(new LocalStrategy(
     });
   }
 ));
-
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-  });
-
-passport.deserializeUser(function(user, done) {
-    done(null, user);
-  });   
