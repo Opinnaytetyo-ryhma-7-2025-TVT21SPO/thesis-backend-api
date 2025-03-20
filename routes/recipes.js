@@ -21,8 +21,8 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/byId', (req, res) => {
-    Recipe.findById(req.body.id).then((recipe) => {
+router.get('/:id', (req, res) => {
+    Recipe.findById(req.params.id).then((recipe) => {
         res.status(200).json(recipe);
     }).catch((err) => {
         res.status(400).json(err);
@@ -33,9 +33,9 @@ router.get('/favourites', isLoggedIn, (req, res) => {
     let listOfRecipes = []
     const listOfFavourites = req.user.dietData.favouriteRecipes;
     console.log(listOfFavourites)
-    for (const recipeIdString in listOfFavourites) {
+    for (let i = 0; i < listOfFavourites.length; i++) {
         console.log(recipeIdString)
-        let newObjectId = new mongoose.Types.ObjectId(recipeIdString)
+        let newObjectId = new mongoose.Types.ObjectId(listOfFavourites[i])
         listOfRecipes.push({_id: newObjectId})
     }
     if(listOfRecipes.length == 0) {
