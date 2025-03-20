@@ -21,6 +21,21 @@ router.get('/', (req, res) => {
     });
 });
 
+router.get('/favourites', isLoggedIn, (req, res) => {
+    let listOfRecipes = []
+    const listOfFavourites = req.user.dietData.favouriteRecipes;
+    for (let i = 0; i < listOfFavourites.length; i++) {
+        let newObjectId = new mongoose.Types.ObjectId(listOfFavourites[i])
+        listOfRecipes.push({_id: newObjectId})
+    }
+    if(listOfFavourites.length == 0) {
+        res.status(200).json({})
+    }
+    Recipe.find({$or: listOfRecipes}).then((recipes) => {
+        res.status(200).send(recipes);
+    })
+})
+
 router.get('/:id', (req, res) => {
     Recipe.findById(req.params.id).then((recipe) => {
         res.status(200).json(recipe);
@@ -29,22 +44,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.get('/favourites', isLoggedIn, (req, res) => {
-    let listOfRecipes = []
-    const listOfFavourites = req.user.dietData.favouriteRecipes;
-    console.log(listOfFavourites)
-    for (let i = 0; i < listOfFavourites.length; i++) {
-        console.log(recipeIdString)
-        let newObjectId = new mongoose.Types.ObjectId(listOfFavourites[i])
-        listOfRecipes.push({_id: newObjectId})
-    }
-    if(listOfRecipes.length == 0) {
-        res.status(200).json({})
-    }
-    Recipe.find({$or: listOfRecipes}).then((recipes) => {
-        res.status(200).send(recipes);
-    })
-})
+
 
 router.get('/filtered/:category', (req, res) => {
     Recipe.find({$or: [{ingredientsEnglish: req.params.category}, {ingredientsFinnish: req.params.category}, {allergens: req.params.category}, {dishType: req.params.category}]}).then((recipes) => {
