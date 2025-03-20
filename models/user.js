@@ -48,7 +48,7 @@ const userSchema = new Schema({
             type: Array,
             required: false,
         },
-        dietaryRestrictions: {
+        diets: {
             type: Array,
             required: false,
         },
