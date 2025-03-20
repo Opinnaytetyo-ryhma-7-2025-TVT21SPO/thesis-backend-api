@@ -66,14 +66,6 @@ const userSchema = new Schema({
         },
     },
     historyData: {
-        recipesHistory: {
-            type: Array,
-            required: false,
-        },
-        mealsHistory: {
-            type: Array,
-            required: false,
-        },
         weightHistory: {
             type: Array,
             required: false,

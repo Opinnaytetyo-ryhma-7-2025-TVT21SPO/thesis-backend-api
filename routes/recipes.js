@@ -1,11 +1,16 @@
 const router = require('express').Router();
 const passport = require('passport');
 require('../config/passport');
+const mongoose = require('mongoose');
 
 const CLIENT_URL = 'http://localhost:8081';
 
 const Recipe = require('../models/recipe');
 const ValidTerms = require('../models/valid_term');
+
+function isLoggedIn(req, res, next) {
+    req.user ? next () : res.sendStatus(401);
+}
 
 //recipes
 router.get('/', (req, res) => {
@@ -16,13 +21,30 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
-    Recipe.findById(req.params.id).then((recipe) => {
+router.get('/byId', (req, res) => {
+    Recipe.findById(req.body.id).then((recipe) => {
         res.status(200).json(recipe);
     }).catch((err) => {
         res.status(400).json(err);
     });
 });
+
+router.get('/favourites', isLoggedIn, (req, res) => {
+    let listOfRecipes = []
+    const listOfFavourites = req.user.dietData.favouriteRecipes;
+    console.log(listOfFavourites)
+    for (const recipeIdString in listOfFavourites) {
+        console.log(recipeIdString)
+        let newObjectId = new mongoose.Types.ObjectId(recipeIdString)
+        listOfRecipes.push({_id: newObjectId})
+    }
+    if(listOfRecipes.length == 0) {
+        res.status(200).json({})
+    }
+    Recipe.find({$or: listOfRecipes}).then((recipes) => {
+        res.status(200).send(recipes);
+    })
+})
 
 router.get('/filtered/:category', (req, res) => {
     Recipe.find({$or: [{ingredientsEnglish: req.params.category}, {ingredientsFinnish: req.params.category}, {allergens: req.params.category}, {dishType: req.params.category}]}).then((recipes) => {
